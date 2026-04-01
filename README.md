@@ -13,3 +13,4 @@
 - IDE: Visual Studio Code 
 - VCS: Git + GitHub
 - AI-асистент: Codeium / GitHub Copilot
+Проєкт створено для вивчення основ Git та GitHub.
