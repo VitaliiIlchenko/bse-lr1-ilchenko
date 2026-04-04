@@ -2,54 +2,71 @@ import time
 import random
 
 class SmartDocAI:
+    """
+    Система для автоматичного розпізнавання та обробки документів.
+    Згенеровано для Лабораторної роботи №1 (проєкт SmartDoc AI).
+    """
     def __init__(self):
+        # Вимоги з нашого SRS
         self.supported_formats = ['.pdf', '.jpg', '.png']
-        self.is_ready = True
+        self.max_size_mb = 20
 
-    def upload_document(self, filename, file_size_mb):
-        print(f"[*] Завантаження файлу: {filename} ({file_size_mb} MB)...")
+    def validate_and_upload(self, filename, size_mb):
+        """Метод для завантаження та валідації файлу (User Story #2)"""
+        print(f"\n[*] Спроба завантаження: {filename}...")
+        time.sleep(0.7)
         
-        if file_size_mb > 20:
-            print("[!] Помилка: Розмір файлу перевищує ліміт у 20 МБ.")
-            return False
-            
+        # Перевірка формату
         ext = filename[filename.rfind('.'):].lower()
         if ext not in self.supported_formats:
-            print(f"[!] Помилка: Формат {ext} не підтримується.")
+            print(f"[!] ПОМИЛКА: Формат {ext} не підтримується системою.")
             return False
             
-        print("[+] Файл успішно завантажено. Передача до AI-моделі...\n")
+        # Перевірка розміру (Обмеження з SRS)
+        if size_mb > self.max_size_mb:
+            print(f"[!] ПОМИЛКА: Файл занадто великий ({size_mb}MB). Ліміт: {self.max_size_mb}MB.")
+            return False
+            
+        print(f"[+] Файл успішно завантажено. Розмір: {size_mb} MB.")
         return True
 
-    def extract_data(self):
-        print("[*] AI аналізує документ...")
-        time.sleep(1.5) # Симуляція часу обробки
+    def process_with_ai(self):
+        """Емуляція роботи AI-моделі (User Story #3)"""
+        print("[*] Запуск AI-двигуна для розпізнавання тексту...")
+        time.sleep(2.0)  # Імітація обчислень
         
-        # Симуляція витягнутих даних
+        # Генерація "розпізнаних" даних
         extracted_data = {
-            "Компанія": "ТОВ 'Роги та Копита'",
+            "Тип документа": "Invoice (Рахунок-фактура)",
+            "ID документа": f"ID-{random.randint(1000, 9999)}",
             "Дата": "04.04.2026",
-            "Загальна сума": f"{random.randint(1000, 50000)}.00 грн",
-            "Статус": "Успішно розпізнано"
+            "Сума до сплати": f"{random.randint(500, 25000)}.00 UAH",
+            "Точність ШІ": f"{random.uniform(94.5, 99.9):.2f}%"
         }
         
-        print("[+] Дані успішно витягнуто:")
+        print("[+] Дані успішно витягнуто та структуровано:")
         for key, value in extracted_data.items():
-            print(f"    - {key}: {value}")
+            print(f"    > {key}: {value}")
         return extracted_data
 
-def start_project():
-    print("=== Вітаємо у системі SmartDoc AI ===\n")
-    ai_system = SmartDocAI()
+def run_simulation():
+    """Головний сценарій роботи програми"""
+    print("="*40)
+    print("   SMARTDOC AI: СИСТЕМА РОЗПІЗНАВАННЯ   ")
+    print("="*40)
     
-    # Тестовий сценарій (User Story 2 та 3 з нашого беклогу)
-    test_file = "invoice_april.pdf"
-    file_size = 5.2
+    app = SmartDocAI()
     
-    if ai_system.upload_document(test_file, file_size):
-        ai_system.extract_data()
-        
-    print("\n=== Роботу програми завершено ===")
+    # Сценарій 1: Успішна обробка (відповідає Acceptance Criteria в Jira)
+    if app.validate_and_upload("invoice_scan_04.pdf", 4.2):
+        app.process_with_ai()
+    
+    # Сценарій 2: Помилка формату
+    app.validate_and_upload("vacation_photo.exe", 1.5)
+    
+    print("\n" + "="*40)
+    print("       РОБОТУ ПРОГРАМИ ЗАВЕРШЕНО       ")
+    print("="*40)
 
 if __name__ == "__main__":
-    start_project()
+    run_simulation()
