@@ -1,62 +1,51 @@
 class SmartDocAI:
+    # Константи класу 
+    MAX_SIZE_MB = 20
+    LARGE_FILE_THRESHOLD_MB = 10
+    BASE_PRICE = 5.0
+    LARGE_FILE_SURCHARGE = 2.0
+    PRIORITY_MULTIPLIER = 1.5
+
     def __init__(self):
-        # Список дозволених форматів
-        self.supported_formats = ['.pdf', '.jpg', '.png']
-        self.max_size_mb = 20
+        # Використовуємо set для швидкого пошуку форматів
+        self.supported_formats = {'.pdf', '.jpg', '.png'}  
+
+    def _get_extension(self, filename):
+        """Допоміжний приватний метод для виділення розширення (Extract Method)"""
+        if '.' not in filename:
+            return None
+        return filename[filename.rfind('.'):].lower()
 
     def validate_file(self, filename, size_mb):
-        """
-        Метод 1: Валідація файлу.
-        Перевіряє формат та розмір.
-        """
+        """Валідація файлу (Рефакторинг: SRP, Extract Method)"""
         if size_mb <= 0:
-            # Обробка виняткових ситуацій
             raise ValueError("Розмір файлу не може бути нульовим або від'ємним")
 
-        # Пошук розширення
-        if '.' not in filename:
-            return False, "Файл не має розширення"
-        
-        extension = filename[filename.rfind('.'):].lower()
-        
-        # Перевірка формату через цикл
-        is_supported = False
-        for fmt in self.supported_formats:
-            if extension == fmt:
-                is_supported = True
-                break
-        
-        if not is_supported:
-            return False, f"Формат {extension} не підтримується"
+        extension = self._get_extension(filename)
+        if not extension or extension not in self.supported_formats:
+            return False, f"Формат {extension} не підтримується або відсутнє розширення"
 
-        # Перевірка граничного значення розміру
-        if size_mb > self.max_size_mb:
-            return False, "Файл занадто великий (макс. 20МБ)"
+        if size_mb > self.MAX_SIZE_MB:
+            return False, f"Файл занадто великий (макс. {self.MAX_SIZE_MB}МБ)"
 
         return True, "Файл валідний"
 
     def calculate_processing_fee(self, size_mb, is_priority=False):
-        """
-        Метод 2: Розрахунок вартості обробки.
-        Використовує умовні конструкції.
-        """
-        base_price = 5.0
-        if size_mb > 10:
-            base_price += 2.0  # Доплата за великий файл
+        """Розрахунок вартості (Рефакторинг: Simplify Conditional через Guard Clauses)"""
+        price = self.BASE_PRICE
+        if size_mb > self.LARGE_FILE_THRESHOLD_MB:
+            price += self.LARGE_FILE_SURCHARGE
         
         if is_priority:
-            base_price *= 1.5  # Націнка за терміновість
+            price *= self.PRIORITY_MULTIPLIER
             
-        return round(base_price, 2)
+        return round(price, 2)
 
     def get_document_type(self, filename):
-        """
-        Метод 3: Визначення типу документа за ключовими словами.
-        """
+        """Визначення типу документа за ключовими словами"""
         name = filename.lower()
         if "invoice" in name or "check" in name:
             return "Фінансовий документ"
-        elif "contract" in name:
+        if "contract" in name:
             return "Юридичний документ"
-        else:
-            return "Загальний документ"
+        return "Загальний документ"
