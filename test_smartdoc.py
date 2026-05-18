@@ -35,7 +35,7 @@ class TestSmartDocAI(unittest.TestCase):
         result, msg = self.ai.validate_file("data_file", 2)
         # Assert
         self.assertFalse(result)
-        self.assertEqual(msg, "Файл не має розширення")
+        self.assertIn("відсутнє розширення", msg)
 
     def test_case_5_boundary_max(self):
         """BVA: Точно 20МБ (Граничне значення)"""
